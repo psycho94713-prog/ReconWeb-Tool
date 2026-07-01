@@ -4,9 +4,9 @@ import sublist3r
 def get_subdomains(domain: str):
     try:
         subdomains = sublist3r.main(
-            domain,
-            20,          # threads
-            None,        # savefile
+            domain=domain,
+            threads=40,
+            savefile=None,
             ports=None,
             silent=True,
             verbose=False,
@@ -15,11 +15,13 @@ def get_subdomains(domain: str):
         )
 
         return {
+            "status": "success",
             "count": len(subdomains),
-            "subdomains": subdomains
+            "subdomains": sorted(list(set(subdomains)))
         }
 
     except Exception as e:
         return {
-            "error": str(e)
+            "status": "error",
+            "message": str(e)
         }

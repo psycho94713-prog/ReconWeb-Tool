@@ -8,6 +8,7 @@ from app.modules.headers_lookup import get_headers
 #from app.modules.tech_lookup import detect_technology
 from app.modules.subdomain_lookup import get_subdomains
 from app.modules.port_scan import scan_ports
+from app.modules.subdomain_lookup import get_subdomains
 
 router = APIRouter(prefix="/api/v1/osint", tags=["OSINT"])
 
@@ -26,5 +27,6 @@ async def scan_domain(request: DomainRequest):
         "headers": get_headers(request.domain),
         #"technology": detect_technology(request.domain)
         "subdomains": get_subdomains(request.domain),
-        "ports": scan_ports(request.domain)
+        "ports": scan_ports(request.domain),
+        "subdomains": get_subdomains(request.domain)
     }
