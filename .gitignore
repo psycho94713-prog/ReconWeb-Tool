@@ -1,0 +1,6 @@
+venv/
+.env
+osint.db
+__pycache__/
+*.pyc
+*.log
