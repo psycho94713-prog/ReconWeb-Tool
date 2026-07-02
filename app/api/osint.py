@@ -35,9 +35,9 @@ async def scan_domain(request: DomainRequest):
         "ssl": get_ssl_info(request.domain),
         "headers": get_headers(request.domain),
         #"technology": detect_technology(request.domain)
-        "subdomains": get_subdomains(request.domain),
+        #"subdomains": get_subdomains(request.domain),
         "ports": scan_ports(request.domain),
-        "subdomains": get_subdomains(request.domain),
+        #"subdomains": get_subdomains(request.domain),
         "geoip": get_geoip(request.domain),
         "asn": get_asn(get_geoip(request.domain).get("ip")),
         "emails": extract_emails(request.domain),
