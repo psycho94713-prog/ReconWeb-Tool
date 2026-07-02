@@ -13,4 +13,10 @@ class Scan(Base):
 
     scan_type = Column(String)
 
+    risk_score = Column(Integer)
+
+    grade = Column(String)
+
+    status = Column(String)
+
     created_at = Column(DateTime, default=datetime.utcnow)

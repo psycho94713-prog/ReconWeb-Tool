@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api.osint import router as osint_router
 from app.api.history import router as history_router
 from app.api.auth import router as auth_router
+from app.api.report import router as report_router
 from app.routes.web import router as web_router
 
 from app.core.config import settings
@@ -34,6 +35,7 @@ app.add_exception_handler(Exception, global_exception_handler)
 # Routers
 app.include_router(web_router)
 app.include_router(auth_router)
+app.include_router(report_router)
 app.include_router(osint_router)
 app.include_router(history_router)
 
