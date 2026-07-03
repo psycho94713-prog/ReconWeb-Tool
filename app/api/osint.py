@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from fastapi.responses import FileResponse
+
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
@@ -10,7 +12,6 @@ from app.modules.ssl_lookup import get_ssl_info
 from app.modules.headers_lookup import get_headers
 from app.modules.subdomain_lookup import get_subdomains
 from app.modules.port_scan import scan_ports
-from app.modules.subdomain_lookup import get_subdomains
 from app.modules.geoip_lookup import get_geoip
 from app.modules.asn_lookup import get_asn
 from app.modules.email_extractor import extract_emails
@@ -22,6 +23,11 @@ from app.modules.directory_enum import enumerate_directories
 from app.modules.email_security import check_email_security
 from app.modules.technology_detector import detect_technology
 from app.modules.risk_score import calculate_risk_score
+from app.modules.wayback_lookup import get_wayback
+from app.modules.sitemap_lookup import get_sitemap
+from app.modules.securitytxt_lookup import get_security_txt
+
+from app.reports.pdf_report import generate_pdf_report
 
 from app.database.database import SessionLocal
 from app.crud.scan import save_scan
@@ -51,6 +57,10 @@ async def scan_domain(request: DomainRequest):
     ports_future = loop.run_in_executor(executor, scan_ports, request.domain)
     geoip_future = loop.run_in_executor(executor, get_geoip, request.domain)
     emails_future = loop.run_in_executor(executor, extract_emails, request.domain)
+   
+    wayback_future = asyncio.create_task(get_wayback(request.domain))
+    sitemap_future = asyncio.create_task(get_sitemap(request.domain))
+    securitytxt_future = asyncio.create_task(get_security_txt(request.domain))
     cms_future = loop.run_in_executor(executor, detect_cms, request.domain)
     waf_future = loop.run_in_executor(executor, detect_waf, request.domain)
     security_future = loop.run_in_executor(executor, analyze_security_headers,        request.domain)
@@ -70,7 +80,6 @@ async def scan_domain(request: DomainRequest):
         "subdomains": await subdomain_future,
         "ports": await ports_future,
         "geoip": await geoip_future,
-        "asn": get_asn(get_geoip(request.domain).get("ip")),
         "emails": await emails_future,
         "cms": await cms_future,
         "waf": await waf_future,
@@ -78,10 +87,17 @@ async def scan_domain(request: DomainRequest):
         "javascript": await javascript_future,
         "directories": await directory_future,
         "email_security": await emailsec_future, 
-    }
+        "wayback": await wayback_future,
+        "sitemap": await sitemap_future,
+        "security_txt": await securitytxt_future,
+        }
     
     scan_data["asn"] = get_asn(scan_data["geoip"].get("ip"))
     scan_data["risk_score"] = calculate_risk_score(scan_data)
+
+    pdf_report = generate_pdf_report(scan_data)
+
+    scan_data["pdf_report"] = pdf_report
 
     save_scan(
         db=db,
@@ -95,3 +111,22 @@ async def scan_domain(request: DomainRequest):
     executor.shutdown(wait=False)
 
     return scan_data
+
+@router.get("/download-report/{filename}")
+async def download_report(filename: str):
+
+    from pathlib import Path
+
+    file_path = Path("app/reports") / filename
+
+    if not file_path.exists():
+        return {
+            "success": False,
+            "message": "PDF report not found."
+        }
+
+    return FileResponse(
+        path=str(file_path),
+        filename=filename,
+        media_type="application/pdf"
+    )

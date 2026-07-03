@@ -1,8 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     console.log("app.js loaded");
+ 
+    let pdfFilename = "";
 
     const scanBtn = document.getElementById("scanBtn");
+    const downloadBtn = document.getElementById("downloadBtn"); 
+
+    console.log(downloadBtn);
 
     // Dashboard open hote hi History load karo
     loadHistory();
@@ -27,7 +32,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("technology").textContent = "Loading...";
         document.getElementById("cms").textContent = "Loading...";
         document.getElementById("waf").textContent = "Loading...";
-
+        document.getElementById("wayback").textContent = "Loading...";
+        document.getElementById("sitemap").textContent = "Loading...";
+        document.getElementById("security_txt").textContent = "Loading...";
+        
         try {
 
             const response = await fetch("/api/v1/osint/domain", {
@@ -41,6 +49,16 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             const data = await response.json();
+
+            if (data.pdf_report && data.pdf_report.success) {
+
+    pdfFilename = data.pdf_report.filename;
+
+    downloadBtn.disabled = false;
+
+    console.log("PDF Ready:", pdfFilename);
+
+}
 
             progress.style.width = "100%";
             progress.innerText = "Completed";
@@ -63,6 +81,15 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("waf").innerHTML =
                 formatObject(data.waf);
 
+            document.getElementById("wayback").innerHTML =
+                formatObject(data.wayback);
+
+            document.getElementById("sitemap").innerHTML =
+                formatObject(data.sitemap);
+
+            document.getElementById("security_txt").innerHTML =
+                formatObject(data.security_txt);
+
             // Scan complete hone ke baad history refresh
             loadHistory();
 
@@ -79,6 +106,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     });
+
+    downloadBtn.addEventListener("click", function () {
+
+        console.log("Download button clicked");
+
+    if (!pdfFilename) {
+        alert("No PDF available.");
+        return;
+    }
+
+    alert(pdfFilename);
+
+});
 
 });
 
