@@ -23,8 +23,19 @@ def get_ssl_info(domain: str):
                 )
 
                 return {
-                    "subject": dict(x[0] for x in cert["subject"]),
-                    "issuer": dict(x[0] for x in cert["issuer"]),
+                    
+                    "subject": ", ".join(
+                        f"{k}={v}"
+                        for item in cert["subject"]
+                        for k, v in item
+               ),
+
+                "issuer": ", ".join(
+                    f"{k}={v}"
+                    for item in cert["issuer"]
+                    for k, v in item
+                ),
+                    
                     "valid_from": str(valid_from),
                     "expiry": str(expiry),
                     "days_remaining": (expiry - datetime.utcnow()).days,

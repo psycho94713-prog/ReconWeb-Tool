@@ -49,9 +49,9 @@ def generate_pdf_report(scan_data: dict):
     )
 
     # Build the PDF
-    doc.build(elements)
+    # doc.build(elements)
 
-    return str(pdf_path)
+    # return str(pdf_path)
 
     elements.append(
         Paragraph(

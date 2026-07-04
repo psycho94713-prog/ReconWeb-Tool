@@ -7,7 +7,12 @@ async def get_wayback(domain: str):
     Fetch latest Wayback Machine snapshot for a domain.
     """
 
-    url = f"https://archive.org/wayback/available?url={domain}"
+    target_url = f"https://{domain}"
+
+    url = (
+      "https://archive.org/wayback/available"
+       f"?url={target_url}"
+    )
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:

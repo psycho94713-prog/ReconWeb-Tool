@@ -6,7 +6,7 @@ from app.services.http_client import get
 
 def extract_emails(domain: str):
     try:
-        response = get(url)
+        response = get(f"https://{domain}")
 
         soup = BeautifulSoup(response.text, "html.parser")
 

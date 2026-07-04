@@ -50,13 +50,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await response.json();
 
-            if (data.pdf_report && data.pdf_report.success) {
+            console.log(data);
 
-    pdfFilename = data.pdf_report.filename;
+            if (data.pdf_report) {
 
-    downloadBtn.disabled = false;
+               pdfFilename = data.pdf_report.filename;
 
-    console.log("PDF Ready:", pdfFilename);
+               console.log("PDF Filename:", pdfFilename);
+
+               downloadBtn.disabled = false;
+
+               alert("PDF Report Ready!");
 
 }
 
@@ -73,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 formatObject(data.ssl);
 
             document.getElementById("technology").innerHTML =
-                formatObject(data.technology);
+                formatTechnology(data.technology);
 
             document.getElementById("cms").innerHTML =
                 formatObject(data.cms);
@@ -118,10 +122,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     alert(pdfFilename);
 
+window.open(`/api/v1/osint/download-report/${pdfFilename}`, "_blank");
+    
 });
 
 });
-
 
 function formatObject(obj) {
 
@@ -133,19 +138,53 @@ function formatObject(obj) {
 
     for (const key in obj) {
 
+        let value = obj[key];
+
+        // Nested Object
+        if (typeof value === "object" && value !== null) {
+
+            value = `<pre>${JSON.stringify(value, null, 2)}</pre>`;
+
+        }
+        // Array
+        else if (Array.isArray(value)) {
+
+            value = value.join("<br>");
+
+        }
+
         html += `
-            <div class="mb-2">
+            <div class="mb-3">
                 <strong>${key}</strong><br>
-                <span class="text-danger">${obj[key]}</span>
+                ${value}
             </div>
         `;
-
     }
 
     return html;
-
 }
 
+function formatTechnology(data) {
+
+    if (!data || data.status !== "success") {
+        return "<span class='text-danger'>No Technology Detected</span>";
+    }
+
+    let html = "";
+
+    html += `<b>Status:</b> ${data.status}<br>`;
+    html += `<b>Count:</b> ${data.count}<br><br>`;
+
+    html += "<b>Technologies</b><br>";
+
+    data.technologies.forEach(function (tech) {
+
+        html += `✅ ${tech}<br>`;
+
+    });
+
+    return html;
+}
 
 async function loadHistory() {
 
@@ -187,6 +226,47 @@ async function loadHistory() {
             `;
 
         });
+
+        // =============================
+// Dashboard Statistics
+// =============================
+
+document.getElementById("totalScans").innerText = result.data.length;
+
+let totalScore = 0;
+let bestGrade = "-";
+
+result.data.forEach(scan => {
+
+    totalScore += Number(scan.risk_score);
+
+    if (bestGrade === "-") {
+        bestGrade = scan.grade;
+    }
+
+    const grades = ["F", "D", "C", "B", "B+", "A", "A+"];
+
+    if (
+        grades.indexOf(scan.grade) >
+        grades.indexOf(bestGrade)
+    ) {
+        bestGrade = scan.grade;
+    }
+
+});
+
+if (result.data.length > 0) {
+
+    document.getElementById("avgScore").innerText =
+        Math.round(totalScore / result.data.length);
+
+    document.getElementById("bestGrade").innerText =
+        bestGrade;
+
+    document.getElementById("lastScan").innerText =
+        result.data[0].domain;
+
+}
 
     } catch (error) {
 
