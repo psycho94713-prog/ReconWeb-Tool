@@ -10,6 +10,8 @@ from app.core.security import (
     create_access_token,
 )
 
+from app.core.config import settings
+
 router = APIRouter(
     prefix="/api/v1/auth",
     tags=["Authentication"]
@@ -51,6 +53,19 @@ async def register(user: UserRegister):
 
 @router.post("/login")
 async def login(user: UserLogin):
+
+    # Fixed Admin Login
+    if user.username == settings.ADMIN_USERNAME and user.password == settings.ADMIN_PASSWORD:
+
+        token = create_access_token(
+            {"sub": "admin"}
+        )
+
+        return {
+            "access_token": token,
+            "token_type": "bearer"
+        } 
+
     db: Session = SessionLocal()
 
     try:
