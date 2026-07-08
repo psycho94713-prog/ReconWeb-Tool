@@ -211,6 +211,26 @@ http://127.0.0.1:8000/docs
 
 ---
 
+## 🔐 Default Login (Development)
+
+For testing and local development, use the default admin credentials:
+
+```text
+Username: admin
+Password: admin123
+```
+
+The credentials are loaded from the `.env` file.
+
+Example:
+
+```env
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+```
+
+⚠️ For production deployment, change the default credentials before running the application.
+
 # 📄 License
 
 This project is licensed under the **MIT License**.
