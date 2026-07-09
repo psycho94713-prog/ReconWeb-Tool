@@ -57,17 +57,77 @@ margin-bottom:30px;
 
 }
 
-input{
+/* Input Fix */
+input,
+.form-control {
 
-flex:1;
+    flex:1;
 
-padding:12px;
+    background:#0f172a !important;
 
-font-size:16px;
+    color:white !important;
 
-border:none;
+    padding:12px;
 
-border-radius:6px;
+    font-size:16px;
+
+    border:1px solid #3b82f6 !important;
+
+    border-radius:6px;
+
+}
+
+
+/* Placeholder Fix */
+.form-control::placeholder {
+
+    color:#94a3b8 !important;
+
+}
+
+
+/* Scan Mode Dropdown Fix */
+.form-select {
+
+    background-color:#0f172a !important;
+
+    color:#ffffff !important;
+
+    border:1px solid #3b82f6 !important;
+
+}
+
+
+/* Dropdown Menu */
+.form-select option {
+
+    background:#0f172a;
+
+    color:white;
+
+}
+
+
+/* Website Scan Heading */
+.card-body h4 {
+
+    color:#ffffff !important;
+
+}
+
+
+/* Scan Mode Label */
+.form-label {
+
+    color:#ffffff !important;
+
+}
+
+
+/* Card normal text */
+.card {
+
+    color:white !important;
 
 }
 
@@ -225,7 +285,7 @@ pre{
 
     <select
         id="scanMode"
-        class="form-select">
+        class="form-select bg-dark text-light">
 
         <option value="fast" selected>
 
@@ -245,11 +305,11 @@ pre{
            
             <div class="input-group">
 
-                <input
-                    type="text"
-                    id="domain"
-                    class="form-control"
-                    placeholder="example.com">
+            <input
+            type="text"
+            id="domain"
+            class="form-control bg-dark text-light"
+            placeholder="example.com">   
 
                 <button
                     id="scanBtn"

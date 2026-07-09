@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
+from app.utils.cleanup import delete_old_scans
 from app.api.osint import router as osint_router
 from app.api.history import router as history_router
 from app.api.auth import router as auth_router
@@ -21,6 +22,11 @@ app = FastAPI(
     version=settings.VERSION,
     debug=settings.DEBUG
 )
+
+@app.on_event("startup")
+def startup_event():
+
+    delete_old_scans()
 
 # Database
 Base.metadata.create_all(bind=engine)
